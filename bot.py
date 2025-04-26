@@ -1,12 +1,14 @@
 import discord
-import json
 import os
 from discord.ext import commands
+from dotenv import load_dotenv
 import asyncio
 
-# 讀取 JSON 設定檔
-with open('items.json', "r", encoding="utf8") as file:
-    data = json.load(file)
+# 載入 .env 檔案
+load_dotenv()
+
+# 取得 Discord Token
+TOKEN = os.getenv("DISCORD_TOKEN")
 
 # 設定 Intents
 intents = discord.Intents.default()
@@ -26,7 +28,6 @@ async def on_ready():
     except Exception as e:
         print(f"❌ Slash 指令同步失敗: {e}")
     game = discord.Game('努力學習py中')
-    #discord.Status.<狀態>，可以是online,offline,idle,dnd,invisible
     await bot.change_presence(status=discord.Status.idle, activity=game)
 
 # 自動載入 cogs 資料夾內的模組
@@ -39,7 +40,7 @@ async def load_cogs():
 async def main():
     async with bot:
         await load_cogs()
-        await bot.start(data["token"])  # 讀取 JSON 檔內的 Token
+        await bot.start(TOKEN)  # 用 .env 的 Token 啟動
 
 # 指令：載入某個 Cog
 @bot.command()
@@ -68,5 +69,6 @@ async def reload(ctx, extension):
     except Exception as e:
         await ctx.send(f"❌ 重新載入 {extension}.py 失敗: {e}")
 
-import asyncio
-asyncio.run(main())  # 使用 asyncio.run() 來啟動 bot
+# 啟動主程式
+if __name__ == "__main__":
+    asyncio.run(main())
